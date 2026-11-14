@@ -9,6 +9,13 @@ The full documentation is in Russian: [README_RU.md](README_RU.md). This page is
 > unbootable and may require recovery over UART. Use it at your own risk. This project is not affiliated with
 > Yeelight, Xiaomi or MediaTek.
 
+## Ready-to-flash image
+
+A built image is attached to the [latest release](https://github.com/klarnet2009/yeelight-ceiling3-firmware-patch/releases/latest).
+Step-by-step instructions: [FLASHING.md](FLASHING.md) (Russian: [FLASHING_RU.md](FLASHING_RU.md)). The flashing
+tool checks the lamp's model, firmware version, chip and Wi-Fi core firmware and refuses anything other than the
+tested configuration. It was tested on one lamp only.
+
 ## What the `--hybrid` image does
 
 `python patch_ota.py --hybrid` builds `yeelink.light.ceiling3-hybrid-2.0.2_0048.bin` from the stock OTA file:
@@ -84,12 +91,14 @@ python tools/diff_light_mixer.py  # clean mixer vs. original, 63,600 cases
 - `tools/`: build, emulator tests, log reader, Ghidra scripts. `decomp/`: analysis notes and the function table.
 - `docs/`: early working notes in Russian (README_RU.md is the current description).
 
-Not included: any Yeelight/Xiaomi/MediaTek firmware, extracted segments, Ghidra projects and raw decompiler output.
-Some notes refer to such files; they are not needed to read the code.
+Not in the repository tree: any Yeelight/Xiaomi/MediaTek firmware, extracted segments, Ghidra projects and raw
+decompiler output. Some notes refer to such files; they are not needed to read the code. The only firmware
+binary published here is the patched image attached to the release.
 
 ## License
 
 MIT, see [LICENSE](LICENSE). The license covers only this project's own code and notes. The Yeelight, Xiaomi and
-MediaTek firmware is not part of this repository and is not covered by it. `firmware/clean_src` contains
+MediaTek firmware is not covered by it; that includes the vendor code inside the release image, which is the stock
+firmware `2.0.2_0048` with this project's patches applied. `firmware/clean_src` contains
 reconstructions of the vendor firmware's behaviour, published for interoperability research; the original firmware
 remains the property of its owners.

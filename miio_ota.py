@@ -1,9 +1,13 @@
 """Minimal miio client for the ceiling3 lamp: read info / flash a local OTA image.
 
-  python miio_ota.py info                       # miIO.info (checks token, shows fw_ver)
+  python miio_ota.py info                       # miIO.info (token masked)
+  python miio_ota.py check                      # is this the lamp the images were made for?
   python miio_ota.py state                      # miIO.get_ota_state + progress
   python miio_ota.py flash <image.bin> --yes    # serve image over HTTP and send miIO.ota
 
+flash refuses any device whose miIO.info does not match EXPECTED below (model, firmware
+version, chip, Wi-Fi core firmware). --force skips that check: only for a lamp you can
+recover over UART.
 Token: 32 hex chars in token.txt next to this script (never passed on the command line).
 Lamp IP: --ip=192.168.0.20 (default). The image must pass patch_ota.parse() (all container
 checks) before it is offered to the lamp. Needs the `cryptography` package (AES-128-CBC).
@@ -182,6 +186,33 @@ def serve(path):
     return srv, url, hashlib.md5(data).hexdigest(), hits
 
 
+# What miIO.info reports on the lamp these images were built for and tested on (YLXD17YL).
+# The images replace the whole application and Wi-Fi core firmware of version 2.0.2_0048;
+# every address they patch is specific to that build.
+EXPECTED = {
+    'model': 'yeelink.light.ceiling3',
+    'fw_ver': '2.0.2_0048',
+    'hw_ver': 'MTK7697',
+    'wifi_fw_ver': '20190110183129',
+}
+
+
+def mismatches(info):
+    """[(field, reported, expected)] for every field of miIO.info that differs from EXPECTED."""
+    return [(k, info.get(k), v) for k, v in EXPECTED.items() if str(info.get(k)) != v]
+
+
+def check():
+    info = Miio(IP, token()).call('miIO.info').get('result', {})
+    for k, v in EXPECTED.items():
+        ok = str(info.get(k)) == v
+        print(f'  {"OK      " if ok else "MISMATCH"} {k}: {info.get(k)!r}' + ('' if ok else f' (expected {v!r})'))
+    bad = mismatches(info)
+    print('this lamp matches the tested configuration' if not bad else
+          'this is NOT the configuration the images were made for: do not flash')
+    return not bad
+
+
 def flash(path):
     sys.path.insert(0, HERE)
     import patch_ota  # reuse the container validator
@@ -191,9 +222,14 @@ def flash(path):
     dev = Miio(IP, token())
     info = dev.call('miIO.info').get('result', {})
     life0 = info.get('life') or 0
-    say(f'lamp: model={info.get("model")} fw_ver={info.get("fw_ver")} life={life0}')
-    if info.get('model') != 'yeelink.light.ceiling3':
-        raise SystemExit('refusing: device is not yeelink.light.ceiling3')
+    say(f'lamp: model={info.get("model")} fw_ver={info.get("fw_ver")} hw_ver={info.get("hw_ver")} '
+        f'wifi_fw_ver={info.get("wifi_fw_ver")} life={life0}')
+    bad = mismatches(info)
+    if bad:
+        why = '; '.join(f'{k} is {got!r}, expected {want!r}' for k, got, want in bad)
+        if 'force' not in OPTS:
+            raise SystemExit(f'refusing to flash: {why}. This is not the lamp/firmware the image was made for.')
+        say(f'WARNING: --force given, flashing despite: {why}')
     srv, url, md5, hits = serve(path)
     say(f'serving {url}')
     if 'yes' not in OPTS:
@@ -257,7 +293,12 @@ def flash(path):
 def main():
     cmd = ARGS[0] if ARGS else 'info'
     if cmd == 'info':
-        print(json.dumps(Miio(IP, token()).call('miIO.info'), indent=1))
+        reply = Miio(IP, token()).call('miIO.info')
+        if isinstance(reply.get('result'), dict) and 'token' in reply['result']:
+            reply['result']['token'] = '<hidden>'           # the device token is a secret
+        print(json.dumps(reply, indent=1))
+    elif cmd == 'check':
+        sys.exit(0 if check() else 1)
     elif cmd == 'state':
         dev = Miio(IP, token())
         print(dev.call('miIO.get_ota_state'), dev.call('miIO.get_ota_progress'))

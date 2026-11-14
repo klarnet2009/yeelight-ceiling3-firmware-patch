@@ -1,0 +1,11 @@
+*.bin
+token.txt
+*.log
+*.png
+provenance.json
+extracted/
+ghidra-proj/
+firmware/build/
+__pycache__/
+decomp/**/*.c
+decomp/include/

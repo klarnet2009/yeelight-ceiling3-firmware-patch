@@ -1,0 +1,17 @@
+{
+  "source": "https://raw.githubusercontent.com/syssi/esphome-yeelight-ceiling-light/main/docs/data/stock-firmware.json",
+  "model": "yeelink.light.ceiling3",
+  "entry": {
+    "version": "2.0.2_0048",
+    "md5": "13b7471a0f84e3cfbac78c116fae7a1c",
+    "size": 726978,
+    "chip": null,
+    "upload_time": 1593423285,
+    "changeLog": "Optimize wifi compatibility",
+    "fw_change_log": "Optimize wifi compatibility",
+    "mcu_change_log": "",
+    "history": null
+  },
+  "compatibility_verified": false,
+  "evidence_type": "public catalog metadata, not device compatibility"
+}

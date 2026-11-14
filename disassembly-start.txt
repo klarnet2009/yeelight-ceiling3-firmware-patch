@@ -1,0 +1,72 @@
+ARM Thumb disassembly; tentative mapped base 0x10071000.
+This base is supported by startup code literals and the segment-2 trampoline.
+No Ghidra decompilation was performed.
+
+10071000: dff854d0   ldr.w    sp, [pc, #0x54]
+10071004: 72b6       cpsid    i
+10071006: 1549       ldr      r1, [pc, #0x54]
+10071008: 154a       ldr      r2, [pc, #0x54]
+1007100a: 164b       ldr      r3, [pc, #0x58]
+1007100c: 9a42       cmp      r2, r3
+1007100e: 3ebf       ittt     lo
+10071010: 51f8040b   ldrlo    r0, [r1], #4
+10071014: 42f8040b   strlo    r0, [r2], #4
+10071018: f8e7       blo      #0x1007100c
+1007101a: 1349       ldr      r1, [pc, #0x4c]
+1007101c: 134a       ldr      r2, [pc, #0x4c]
+1007101e: 144b       ldr      r3, [pc, #0x50]
+10071020: 9a42       cmp      r2, r3
+10071022: 3ebf       ittt     lo
+10071024: 51f8040b   ldrlo    r0, [r1], #4
+10071028: 42f8040b   strlo    r0, [r2], #4
+1007102c: f8e7       blo      #0x10071020
+1007102e: 114a       ldr      r2, [pc, #0x44]
+10071030: 114b       ldr      r3, [pc, #0x44]
+10071032: 9a42       cmp      r2, r3
+10071034: 3ebf       ittt     lo
+10071036: 0020       movlo    r0, #0
+10071038: 42f8040b   strlo    r0, [r2], #4
+1007103c: f9e7       blo      #0x10071032
+1007103e: 0f4a       ldr      r2, [pc, #0x3c]
+10071040: 0f4b       ldr      r3, [pc, #0x3c]
+10071042: 9a42       cmp      r2, r3
+10071044: 3ebf       ittt     lo
+10071046: 0020       movlo    r0, #0
+10071048: 42f8040b   strlo    r0, [r2], #4
+1007104c: f9e7       blo      #0x10071042
+1007104e: 0d48       ldr      r0, [pc, #0x34]
+10071050: 8047       blx      r0
+10071052: 0d48       ldr      r0, [pc, #0x34]
+10071054: 0047       bx       r0
+10071056: 0000       movs     r0, r0
+
+Literal words following startup code:
+10071058: 20040000
+1007105c: 1014c4e4
+10071060: 20000000
+10071064: 20001548
+10071068: 1014da2c
+1007106c: 00100000
+10071070: 00102c18
+10071074: 00102c20
+10071078: 0010f4b5
+1007107c: 20001548
+10071080: 2003aa44
+10071084: 100bac69
+10071088: 100a7695
+1007108c: 0000e7fe
+10071090: 4b040200
+10071094: 50c22200
+10071098: f44f3308
+1007109c: 50c24200
+
+Selected diagnostic strings:
+file+0xb266d; flash alias 0x1012366d: yeelink.light.ceiling3
+file+0xd65a9; flash alias 0x101475a9: 2.0.2
+file+0xb145a; flash alias 0x1012245a: SDK_V4.8.0_wifi
+file+0xdc36c; flash alias 0x1014d36c: SDK_V4.8.0_wifi
+file+0xb4b8b; flash alias 0x10125b8b: miio_wifi_try_reconnect
+file+0xb3a2f; flash alias 0x10124a2f: sta_monitor_offline_timeout
+file+0xb4cfd; flash alias 0x10125cfd: sta_monitor_offline_countout
+file+0x9f94a; flash alias 0x1011094a: sys_assert : loop forever
+file+0xb8963; flash alias 0x10129963: FreeRTOS Running
